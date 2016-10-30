@@ -12,10 +12,27 @@ namespace Healthbars
     {
         BraveBehaviour parent;
         SGroup bar;
+        float lastHealth;
 
         private void OnDeath(Vector2 _)
         {
             bar.Remove();
+        }
+
+        private void OnHealthChanged(float current, float max)
+        {
+            new SGroup()
+            {
+                With =
+                {
+                    new DamageLabelModifier(Mathf.RoundToInt(2*(current-lastHealth)).ToString(), (current>lastHealth) ? Color.green : Color.red),
+                    //new SFadeOutAnimation(1.3f),
+                    new FloatAwayAnimation(1.3f, parent.sprite.WorldTopCenter, new Vector2(0, -50)),
+                    //new SInGameModifier()
+                }
+            };
+
+            lastHealth = current;
         }
 
         public void Start()
@@ -33,6 +50,9 @@ namespace Healthbars
             };
 
             parent.healthHaver.OnDeath += OnDeath;
+            parent.healthHaver.OnHealthChanged += OnHealthChanged;
+
+            lastHealth = parent.healthHaver.GetCurrentHealth();
         }
     }
 

@@ -51,7 +51,15 @@ namespace Healthbars
                 return;
             }
 
-            RoomHandler room = m_parent.transform.position.GetAbsoluteRoom();
+            RoomHandler room;
+            try
+            {
+                room = m_parent.transform.position.GetAbsoluteRoom();
+            }
+            catch
+            {
+                room = null;
+            }
 
             if (GameManager.Instance.IsPaused || room == null || (room.visibility == RoomHandler.VisibilityStatus.OBSCURED || room.visibility == RoomHandler.VisibilityStatus.REOBSCURED))
             {
@@ -69,10 +77,18 @@ namespace Healthbars
         private class HealthBarInterior : SModifier
         {
             private HealthHaver m_HealthHaver;
+            private float healthPercent;
 
             public HealthBarInterior(HealthHaver health)
             {
                 m_HealthHaver = health;
+                m_HealthHaver.OnHealthChanged += OnHealthChanged;
+                healthPercent = 1;
+            }
+
+            private void OnHealthChanged(float current, float max)
+            {
+                healthPercent = current / max;
             }
 
             public override void Update()
@@ -83,7 +99,7 @@ namespace Healthbars
                     return;
                 }
 
-                Elem.Size.x = Elem.Parent.InnerSize.x * m_HealthHaver.GetCurrentHealthPercentage();
+                Elem.Size.x = Elem.Parent.InnerSize.x * healthPercent;
             }
 
             public override void UpdateStyle()
