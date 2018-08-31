@@ -54,6 +54,17 @@ namespace Healthbars
 
             lastHealth = parent.healthHaver.GetCurrentHealth();
         }
+        
+        //this will find the enemies that get missed from the addhook including spawned enemies
+        public void Update()
+        {
+            foreach (AIActor t in StaticReferenceManager.AllEnemies)
+            {
+                if (t.GetComponent<HealthBarBehavior>() == null)
+                    t.gameObject.AddComponent<HealthBarBehavior>();
+
+            }
+        }
     }
 
     public class Healthbars : ETGModule
